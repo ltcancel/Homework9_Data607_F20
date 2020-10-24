@@ -1,0 +1,46 @@
+---
+title: "Homework9_Data607_F20"
+author: "LeTicia Cancel"
+date: "10/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Libraries
+```{r message=FALSE, warning=FALSE}
+library(jsonlite)
+```
+# Get Data
+
+Get data from NY Times and transform it to a dataframe
+```{r}
+
+#most popular viewed articles in the past 30 days
+most_popular <- fromJSON("https://api.nytimes.com/svc/mostpopular/v2/viewed/30.json?api-key=PznXIQ8GgeAC84XdXYy34uS8IGQhqqyA")
+most_popular
+
+# dataframe of results
+most_populardf <- most_popular$results
+
+most_populardf
+most_populardf$des_facet
+most_populardf$org_facet
+most_populardf$per_facet
+most_populardf$geo_facet
+
+
+total_words <- job_words %>%
+  group_by(Job_Title) %>%
+  summarise(total = sum(n))
+```
+
+# Analysis
+```{r}
+#most viewed section
+most_populardf %>%
+  count(section)
+```
+
