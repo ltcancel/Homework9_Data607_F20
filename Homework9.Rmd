@@ -2,7 +2,12 @@
 title: "Homework9_Data607_F20"
 author: "LeTicia Cancel"
 date: "10/22/2020"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -11,36 +16,53 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Libraries
 ```{r message=FALSE, warning=FALSE}
+#install.packages("prettydoc")
 library(jsonlite)
+library(dplyr)
+library(ggplot2)
 ```
+
 # Get Data
 
-Get data from NY Times and transform it to a dataframe
+The API used for this assignment is for the most popular articles.
 ```{r}
-
-#most popular viewed articles in the past 30 days
+#most viewed articles in the past 30 days
 most_popular <- fromJSON("https://api.nytimes.com/svc/mostpopular/v2/viewed/30.json?api-key=PznXIQ8GgeAC84XdXYy34uS8IGQhqqyA")
-most_popular
 
-# dataframe of results
+#create a dataframe that only includes the details of the most viewed articles
 most_populardf <- most_popular$results
 
-most_populardf
-most_populardf$des_facet
-most_populardf$org_facet
-most_populardf$per_facet
-most_populardf$geo_facet
+head(most_populardf)
 
-
-total_words <- job_words %>%
-  group_by(Job_Title) %>%
-  summarise(total = sum(n))
 ```
 
 # Analysis
+
+If we look at the Section column in the dataframe we can see the most viewed section of the NY Times is the U.S. section. We also see that the most viewed subsection from this group is Politics. 
 ```{r}
 #most viewed section
 most_populardf %>%
-  count(section)
+  group_by(section) %>%
+  count(subsection, sort = TRUE)
+```
+
+We can also look at one of the facets included in the data. It looks like it is a description facet and when we use ggplot we can see that United States Politics and Government is the top facet. 
+```{r}
+#create dataframe of the facet we want to analyze
+facet1 <- as.data.frame(unlist(most_populardf$des_facet), stringsAsFactors = FALSE)
+
+# rename column to make it easier to plot
+facet1 <- facet1 %>%
+  rename(des = 'unlist(most_populardf$des_facet)')
+
+head(facet1)
+
+
+facet1 %>%
+  count(des, sort = TRUE) %>%
+  top_n(10, des) %>%
+  ggplot(aes(des,n)) +
+  geom_col() +
+  coord_flip()
 ```
 
